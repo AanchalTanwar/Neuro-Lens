@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroLens — Guardian Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <!-- Leaflet.js for Map -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+</head>
+<body class="guardian-body">
+
+  <!-- Sidebar -->
+  <aside class="guardian-sidebar" id="guardian-sidebar">
+    <div class="sidebar-logo">
+      <i class="fa-solid fa-brain"></i>
+      <span>NeuroLens</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="sidebar-link active" data-tab="overview" onclick="switchTab('overview', this)">
+        <i class="fa-solid fa-gauge-high"></i> Overview
+      </a>
+      <a class="sidebar-link" data-tab="map" onclick="switchTab('map', this)">
+        <i class="fa-solid fa-map"></i> Live Map
+      </a>
+      <a class="sidebar-link" data-tab="alerts" onclick="switchTab('alerts', this)">
+        <i class="fa-solid fa-bell"></i> Alerts
+        <span class="badge" id="alerts-badge">0</span>
+      </a>
+      <a class="sidebar-link" data-tab="reminders" onclick="switchTab('reminders', this)">
+        <i class="fa-solid fa-pills"></i> Reminders
+      </a>
+      <a class="sidebar-link" data-tab="faces" onclick="switchTab('faces', this)">
+        <i class="fa-solid fa-users"></i> Face Log
+      </a>
+    </nav>
+    <div class="sidebar-patient-card">
+      <div class="spc-avatar"><i class="fa-solid fa-user-injured"></i></div>
+      <div class="spc-info">
+        <div class="spc-name">Shanti Devi</div>
+        <div class="spc-status" id="spc-status">
+          <span class="pulse-dot green"></span> Active
+        </div>
+      </div>
+    </div>
+    <a href="index.html" class="sidebar-back">
+      <i class="fa-solid fa-arrow-left"></i> Back to Home
+    </a>
+  </aside>
+
+  <!-- Mobile Hamburger -->
+  <button class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
+  <!-- Main Content -->
+  <main class="guardian-main">
+    <!-- Header Bar -->
+    <div class="guardian-topbar">
+      <div>
+        <h1 class="guardian-title">Guardian Dashboard</h1>
+        <p class="guardian-sub">Welcome back, <strong>Aanchal</strong> 👋</p>
+      </div>
+      <div class="topbar-right">
+        <div class="guardian-clock" id="guardian-clock">—</div>
+        <button class="demo-toggle-btn" id="demo-btn" onclick="toggleDemoMode()">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Demo Mode
+        </button>
+      </div>
+    </div>
+
+    <!-- ======================== OVERVIEW TAB ======================== -->
+    <div class="tab-content active" id="tab-overview">
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon" style="color:#4ecdc4;background:#4ecdc422;"><i class="fa-solid fa-location-dot"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="ov-location">Home Zone</div>
+            <div class="stat-label">Last Location</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:#f7b731;background:#f7b73122;"><i class="fa-solid fa-person-walking"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="ov-activity">Idle</div>
+            <div class="stat-label">Activity Status</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:#ff6b9d;background:#ff6b9d22;"><i class="fa-solid fa-bell"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="ov-alerts">0</div>
+            <div class="stat-label">Active Alerts</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="color:#a29bfe;background:#a29bfe22;"><i class="fa-solid fa-shield-check"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="ov-safe">Safe</div>
+            <div class="stat-label">Geofence Status</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div class="overview-grid">
+        <!-- Mini Map -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-map"></i> Live Location</h3>
+            <button class="card-btn" onclick="switchTab('map', null)">Full Map</button>
+          </div>
+          <div id="mini-map" class="mini-map-container"></div>
+          <div class="map-status-row">
+            <span id="map-coord-mini">Locating...</span>
+            <span class="zone-chip" id="zone-chip-mini">In Safe Zone</span>
+          </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-chart-line"></i> Activity Log</h3>
+          </div>
+          <ul class="activity-list" id="activity-list">
+            <li class="activity-item"><span class="activity-time">Now</span><span class="activity-desc">System started</span></li>
+          </ul>
+        </div>
+
+        <!-- Recent Alerts -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> Recent Alerts</h3>
+            <span class="unread-count" id="unread-count">0 new</span>
+          </div>
+          <ul class="alerts-list" id="overview-alerts-list">
+            <li class="no-alerts-msg">No alerts yet. System is calm 🌿</li>
+          </ul>
+        </div>
+
+        <!-- Face Recognition Log -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-eye"></i> Recognised Faces</h3>
+          </div>
+          <ul class="face-log-list" id="overview-face-log">
+            <li class="face-log-item">
+              <div class="fl-avatar" style="background:#ff6b9d22;color:#ff6b9d;"><i class="fa-solid fa-heart"></i></div>
+              <div class="fl-info">
+                <div class="fl-name">Riya (Daughter)</div>
+                <div class="fl-time">Waiting for scan...</div>
+              </div>
+              <div class="fl-badge">Known</div>
+            </li>
+            <li class="face-log-item">
+              <div class="fl-avatar" style="background:#4ecdc422;color:#4ecdc4;"><i class="fa-solid fa-user"></i></div>
+              <div class="fl-info">
+                <div class="fl-name">Rajesh (Son)</div>
+                <div class="fl-time">Waiting for scan...</div>
+              </div>
+              <div class="fl-badge">Known</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== MAP TAB ======================== -->
+    <div class="tab-content" id="tab-map">
+      <div class="card full-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-map-location-dot"></i> Live Patient Location</h3>
+          <div class="map-controls">
+            <span class="zone-chip" id="zone-chip-full">In Safe Zone</span>
+            <button class="card-btn" onclick="centerMap()"><i class="fa-solid fa-crosshairs"></i> Center</button>
+          </div>
+        </div>
+        <div id="full-map" class="full-map-container"></div>
+        <div class="geofence-row">
+          <div class="gf-info">
+            <i class="fa-solid fa-circle-dot" style="color:#4ecdc4;"></i>
+            <strong>Safe Zone Radius:</strong> <span id="safe-radius">200m</span>
+          </div>
+          <div class="gf-controls">
+            <label>Radius:</label>
+            <input type="range" min="50" max="500" value="200" step="50" id="radius-slider" oninput="updateRadius(this.value)" />
+            <span id="radius-val">200m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== ALERTS TAB ======================== -->
+    <div class="tab-content" id="tab-alerts">
+      <div class="card full-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-bell"></i> Alert Centre</h3>
+          <button class="card-btn danger" onclick="clearAlerts()"><i class="fa-solid fa-trash"></i> Clear All</button>
+        </div>
+        <div class="alerts-filters">
+          <button class="filter-btn active" onclick="filterAlerts('all', this)">All</button>
+          <button class="filter-btn" onclick="filterAlerts('emergency', this)">Emergency</button>
+          <button class="filter-btn" onclick="filterAlerts('geofence', this)">Geofence</button>
+          <button class="filter-btn" onclick="filterAlerts('face', this)">Face</button>
+        </div>
+        <ul class="alerts-full-list" id="full-alerts-list">
+          <li class="no-alerts-msg">All quiet — no alerts received.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ======================== REMINDERS TAB ======================== -->
+    <div class="tab-content" id="tab-reminders">
+      <div class="overview-grid">
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-plus"></i> Add Reminder</h3>
+          </div>
+          <div class="reminder-form">
+            <div class="form-group">
+              <label>Type</label>
+              <select id="reminder-type" class="form-input">
+                <option value="medicine">💊 Medicine</option>
+                <option value="food">🍽️ Food / Water</option>
+                <option value="exercise">🚶 Exercise</option>
+                <option value="appointment">🏥 Appointment</option>
+                <option value="custom">📝 Custom</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <input type="text" id="reminder-msg" class="form-input" placeholder="e.g. Take blood pressure tablet" />
+            </div>
+            <div class="form-group">
+              <label>Time</label>
+              <input type="time" id="reminder-time" class="form-input" />
+            </div>
+            <button class="btn-submit" onclick="addReminder()">
+              <i class="fa-solid fa-paper-plane"></i> Send to Patient
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-list-check"></i> Active Reminders</h3>
+          </div>
+          <ul class="reminders-list" id="reminders-list">
+            <li class="reminder-item">
+              <div class="ri-icon medicine"><i class="fa-solid fa-pills"></i></div>
+              <div class="ri-info">
+                <div class="ri-msg">Take BP tablet</div>
+                <div class="ri-time"><i class="fa-regular fa-clock"></i> 08:00 AM</div>
+              </div>
+              <div class="ri-status sent">Synced</div>
+            </li>
+            <li class="reminder-item">
+              <div class="ri-icon food"><i class="fa-solid fa-bowl-food"></i></div>
+              <div class="ri-info">
+                <div class="ri-msg">Lunch time</div>
+                <div class="ri-time"><i class="fa-regular fa-clock"></i> 01:00 PM</div>
+              </div>
+              <div class="ri-status sent">Synced</div>
+            </li>
+            <li class="reminder-item">
+              <div class="ri-icon medicine"><i class="fa-solid fa-pills"></i></div>
+              <div class="ri-info">
+                <div class="ri-msg">Evening medicine</div>
+                <div class="ri-time"><i class="fa-regular fa-clock"></i> 05:00 PM</div>
+              </div>
+              <div class="ri-status sent">Synced</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================== FACE LOG TAB ======================== -->
+    <div class="tab-content" id="tab-faces">
+      <div class="card full-card">
+        <div class="card-header">
+          <h3><i class="fa-solid fa-users"></i> Face Recognition Log</h3>
+        </div>
+        <div class="face-log-full" id="face-log-full">
+          <div class="face-log-card">
+            <div class="flc-avatar riya"><i class="fa-solid fa-heart"></i></div>
+            <div class="flc-info">
+              <div class="flc-name">Riya (Daughter)</div>
+              <div class="flc-relation">Family Member</div>
+              <div class="flc-last" id="riya-last">Not seen yet</div>
+            </div>
+            <div class="flc-tag known">Known</div>
+          </div>
+          <div class="face-log-card">
+            <div class="flc-avatar rajesh"><i class="fa-solid fa-user"></i></div>
+            <div class="flc-info">
+              <div class="flc-name">Rajesh (Son)</div>
+              <div class="flc-relation">Family Member</div>
+              <div class="flc-last" id="rajesh-last">Not seen yet</div>
+            </div>
+            <div class="flc-tag known">Known</div>
+          </div>
+          <div class="face-log-card">
+            <div class="flc-avatar aanchal"><i class="fa-solid fa-shield-heart"></i></div>
+            <div class="flc-info">
+              <div class="flc-name">Aanchal (Guardian)</div>
+              <div class="flc-relation">Primary Caregiver</div>
+              <div class="flc-last" id="aanchal-last">Not seen yet</div>
+            </div>
+            <div class="flc-tag caregiver">Caregiver</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Emergency Modal -->
+  <div class="emergency-modal" id="emergency-modal">
+    <div class="em-card">
+      <div class="em-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h2>🚨 EMERGENCY ALERT</h2>
+      <p>Shanti Devi has triggered an emergency!</p>
+      <div class="em-meta" id="em-meta">Location: Fetching...</div>
+      <div class="em-actions">
+        <button class="em-btn call" onclick="simulateCall()"><i class="fa-solid fa-phone"></i> Call Patient</button>
+        <button class="em-btn dismiss" onclick="dismissEmergency()"><i class="fa-solid fa-check"></i> Acknowledged</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="guardian-toast-container"></div>
+
+  <script src="script.js"></script>
+  <script src="guardian.js"></script>
+</body>
+</html>

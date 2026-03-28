@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroLens — Smart Memory Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="landing-body">
+
+  <!-- Animated Background -->
+  <div class="bg-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <!-- Landing Page -->
+  <div class="landing-container">
+    <!-- Header / Logo -->
+    <header class="landing-header">
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <i class="fa-solid fa-brain"></i>
+        </div>
+        <div class="logo-text">
+          <span class="logo-primary">NeuroLens</span>
+          <span class="logo-tagline">Smart Memory Assistant</span>
+        </div>
+      </div>
+      <div class="demo-badge">
+        <span class="pulse-dot"></span>
+        Demo Mode Active
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="landing-hero">
+      <div class="hero-label">AI-Powered Alzheimer's Care</div>
+      <h1 class="hero-title">
+        Helping loved ones<br/>
+        <span class="gradient-text">remember the world</span>
+      </h1>
+      <p class="hero-desc">
+        NeuroLens combines facial recognition, voice assistance, and real-time location tracking
+        to give Alzheimer's patients independence — and caregivers peace of mind.
+      </p>
+
+      <!-- Role Selection Cards -->
+      <div class="role-cards">
+        <!-- Patient Card -->
+        <a href="patient.html" class="role-card patient-card">
+          <div class="role-card-icon">
+            <i class="fa-solid fa-glasses"></i>
+          </div>
+          <div class="role-card-content">
+            <h2>Patient Interface</h2>
+            <p>Smart Glasses Simulation</p>
+            <ul class="role-features">
+              <li><i class="fa-solid fa-check"></i> Face Recognition</li>
+              <li><i class="fa-solid fa-check"></i> Voice Assistant</li>
+              <li><i class="fa-solid fa-check"></i> Navigation Help</li>
+              <li><i class="fa-solid fa-check"></i> Emergency Alert</li>
+            </ul>
+          </div>
+          <div class="role-card-action">
+            <span>Open as Patient</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </a>
+
+        <!-- Guardian Card -->
+        <a href="guardian.html" class="role-card guardian-card">
+          <div class="role-card-icon">
+            <i class="fa-solid fa-shield-heart"></i>
+          </div>
+          <div class="role-card-content">
+            <h2>Guardian Dashboard</h2>
+            <p>Caregiver Control Center</p>
+            <ul class="role-features">
+              <li><i class="fa-solid fa-check"></i> Live Location Map</li>
+              <li><i class="fa-solid fa-check"></i> Activity Monitoring</li>
+              <li><i class="fa-solid fa-check"></i> Alert System</li>
+              <li><i class="fa-solid fa-check"></i> Reminder Sync</li>
+            </ul>
+          </div>
+          <div class="role-card-action">
+            <span>Open as Guardian</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+
+      <!-- Patient Info Bar -->
+      <div class="patient-info-bar">
+        <div class="patient-info-item">
+          <i class="fa-solid fa-user-injured"></i>
+          <span>Patient: <strong>Shanti Devi</strong></span>
+        </div>
+        <div class="divider-dot"></div>
+        <div class="patient-info-item">
+          <i class="fa-solid fa-heart"></i>
+          <span>Guardian: <strong>Aanchal</strong></span>
+        </div>
+        <div class="divider-dot"></div>
+        <div class="patient-info-item status-ok">
+          <i class="fa-solid fa-circle"></i>
+          <span>System Online</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <p>NeuroLens — Built for Hackathon 2025 &nbsp;|&nbsp; Powered by WebRTC + Speech API + Geolocation</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

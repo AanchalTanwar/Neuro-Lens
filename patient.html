@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeuroLens — Patient View</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="patient-body">
+
+  <!-- Top Status Bar -->
+  <header class="patient-header">
+    <div class="patient-brand">
+      <i class="fa-solid fa-brain"></i>
+      <span>NeuroLens</span>
+    </div>
+    <div class="patient-time" id="patient-clock">00:00 AM</div>
+    <div class="patient-status-row">
+      <span class="status-pill ok"><i class="fa-solid fa-wifi"></i> Connected</span>
+    </div>
+  </header>
+
+  <!-- Greeting Banner -->
+  <div class="greeting-banner">
+    <div class="greeting-avatar"><i class="fa-solid fa-user-nurse"></i></div>
+    <div class="greeting-text">
+      <div class="greeting-hello">Good Morning,</div>
+      <div class="greeting-name">Shanti Devi 🌸</div>
+    </div>
+    <div class="reminder-chip" id="next-reminder-chip">
+      <i class="fa-solid fa-bell"></i> <span id="next-reminder-text">No reminders</span>
+    </div>
+  </div>
+
+  <!-- CAMERA / FACE RECOGNITION PANEL -->
+  <section class="patient-section camera-section">
+    <div class="section-label"><i class="fa-solid fa-camera"></i> Face Recognition</div>
+
+    <div class="camera-container">
+      <!-- Live video feed -->
+      <video id="patient-video" autoplay muted playsinline></video>
+      <canvas id="face-canvas"></canvas>
+
+      <!-- Recognition Overlay -->
+      <div class="face-overlay" id="face-overlay" style="display:none;">
+        <div class="face-box-animated">
+          <div class="face-box-corner tl"></div>
+          <div class="face-box-corner tr"></div>
+          <div class="face-box-corner bl"></div>
+          <div class="face-box-corner br"></div>
+          <div class="scanning-line"></div>
+        </div>
+        <div class="face-tag" id="face-tag">Analyzing...</div>
+      </div>
+
+      <!-- Camera Off Placeholder -->
+      <div class="camera-placeholder" id="camera-placeholder">
+        <i class="fa-solid fa-camera-rotate fa-2x"></i>
+        <p>Tap to Start Camera</p>
+        <button class="btn-large btn-secondary" onclick="startCamera()">
+          <i class="fa-solid fa-video"></i> Start Camera
+        </button>
+      </div>
+    </div>
+
+    <!-- Simulated Person Cards -->
+    <div class="known-faces-row">
+      <div class="known-face-chip" onclick="simulateRecognize('Riya (Daughter)', 'fa-heart', '#ff6b9d')">
+        <div class="kf-avatar" style="background:#ff6b9d22;color:#ff6b9d;"><i class="fa-solid fa-heart"></i></div>
+        <span>Riya</span>
+      </div>
+      <div class="known-face-chip" onclick="simulateRecognize('Rajesh (Son)', 'fa-user', '#4ecdc4')">
+        <div class="kf-avatar" style="background:#4ecdc422;color:#4ecdc4;"><i class="fa-solid fa-user"></i></div>
+        <span>Rajesh</span>
+      </div>
+      <div class="known-face-chip" onclick="simulateRecognize('Aanchal (Guardian)', 'fa-shield-heart', '#f7b731')">
+        <div class="kf-avatar" style="background:#f7b73122;color:#f7b731;"><i class="fa-solid fa-shield-heart"></i></div>
+        <span>Aanchal</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- VOICE ASSISTANT -->
+  <section class="patient-section voice-section">
+    <div class="section-label"><i class="fa-solid fa-microphone"></i> Voice Assistant</div>
+    <div class="voice-card">
+      <div class="voice-response-box" id="voice-response">
+        <i class="fa-solid fa-volume-high response-icon"></i>
+        <p id="voice-response-text">Press the button and ask me anything...</p>
+      </div>
+      <div class="voice-buttons-grid">
+        <button class="btn-large btn-voice" onclick="askAssistant('medicine')">
+          <i class="fa-solid fa-pills"></i>
+          <span>Medicine?</span>
+        </button>
+        <button class="btn-large btn-voice" onclick="askAssistant('location')">
+          <i class="fa-solid fa-map-pin"></i>
+          <span>Where am I?</span>
+        </button>
+        <button class="btn-large btn-voice" onclick="askAssistant('time')">
+          <i class="fa-solid fa-clock"></i>
+          <span>What time?</span>
+        </button>
+        <button class="btn-large btn-voice" onclick="askAssistant('family')">
+          <i class="fa-solid fa-people-group"></i>
+          <span>My Family</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATION PANEL -->
+  <section class="patient-section location-section">
+    <div class="section-label"><i class="fa-solid fa-location-dot"></i> My Location</div>
+    <div class="location-card" id="location-card">
+      <div class="location-icon-wrap"><i class="fa-solid fa-house-chimney fa-2x"></i></div>
+      <div class="location-info">
+        <div class="location-status" id="location-status">Fetching location...</div>
+        <div class="location-coords" id="location-coords">—</div>
+      </div>
+      <div class="location-safe-badge" id="safe-badge">
+        <i class="fa-solid fa-shield-check"></i> Safe Zone
+      </div>
+    </div>
+
+    <!-- Navigation Button -->
+    <button class="btn-large btn-navigate" onclick="navigateHome()">
+      <i class="fa-solid fa-route"></i>
+      <span>Take Me Home</span>
+    </button>
+
+    <!-- Navigation Steps Overlay -->
+    <div class="nav-steps" id="nav-steps" style="display:none;">
+      <div class="nav-step active"><i class="fa-solid fa-arrow-up"></i> Walk straight for 50 metres</div>
+      <div class="nav-step"><i class="fa-solid fa-turn-right"></i> Turn right at the gate</div>
+      <div class="nav-step"><i class="fa-solid fa-house"></i> Your home is on the left</div>
+    </div>
+  </section>
+
+  <!-- EMERGENCY BUTTON -->
+  <section class="patient-section emergency-section">
+    <button class="btn-emergency" id="emergency-btn" onclick="triggerEmergency()">
+      <div class="emergency-ring"></div>
+      <div class="emergency-inner">
+        <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+        <span>EMERGENCY</span>
+        <small>Alert Guardian Now</small>
+      </div>
+    </button>
+  </section>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="patient-toast-container"></div>
+
+  <!-- Nav Back -->
+  <a href="index.html" class="back-link"><i class="fa-solid fa-chevron-left"></i> Home</a>
+
+  <script src="script.js"></script>
+  <script src="patient.js"></script>
+</body>
+</html>
